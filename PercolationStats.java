@@ -1,71 +1,63 @@
-import java.util.Random;
+import edu.princeton.cs.algs4.StdRandom;
+import edu.princeton.cs.algs4.StdStats;
 import static java.lang.Math.sqrt;
-public class PercolationStats {
+public class PercolationStats  {
 
     private int nTrials;
-    private double sum = 0;
-    private int[] vals;
     private int size = 0;
+    private double[] vals;
     // perform trials independent experiments on an n-by-n grid
-   public PercolationStats(int n, int trials){
-        Random rand = new Random();
-        vals = new int[trials];
+   public PercolationStats(int n, int trials) {
+        vals = new double[trials];
         int nOpen;
         nTrials = trials;
         size = n;
-        if (n<=0 || trials<=0)
+        if (n <=0 || trials <=0)
             throw new java.lang.IllegalArgumentException();
         int[] N = new int[trials];
-        for (int i=0;i<trials;i++){
+        for (int i=0;i <trials;i++) {
             Percolation system = new Percolation(n);
             boolean flag = false;
-            while(flag==false){
-                int x = rand.nextInt(n) + 1;
-                int y = rand.nextInt(n) + 1;
+            while(flag== false) {
+                int x = StdRandom.uniform(n) + 1;
+                int y = StdRandom.uniform(n) + 1;
                 system.open(x,y);
                 flag = system.percolates();
                 nOpen = system.numberOfOpenSites();
-                if (flag){
-                    sum = sum + nOpen;
-                    vals[i] = nOpen;
+                if (flag) {
+                    vals[i] = ((double)(nOpen)/(size*size));
                 }
             }
         }
     }
 
     // sample mean of percolation threshold
-    public double mean(){
-        return (sum/nTrials)/(size*size);
+    public double mean() {
+        return StdStats.mean(vals);
     }              
 
    // sample standard deviation of percolation threshold
-   public double stddev() {
-        double avg = mean();
-        double sum = 0;
-        for (int i=0;i<nTrials;i++){
-            sum = sum + (vals[i]/(size*size) - avg)*(vals[i]/(size*size) - avg);
-        }
-        return sqrt(sum/(nTrials-1));
-
+   public double stddev()  {
+        return StdStats.stddev(vals);
    }           
 
    // low  endpoint of 95% confidence interval
-    public double confidenceLo(){
+    public double confidenceLo() {
         double s = stddev();
         double avg = mean();
         return avg -1.96*s/nTrials;
     }
 
     // high endpoint of 95% confidence interval 
-    public double confidenceHi(){
+    public double confidenceHi() {
         double s = stddev();
         double avg = mean();
         return avg -1.96*s/nTrials;
     } 
 
     // test client (described below)
-    public static void main(String[] args){
-        if (args.length > 0){
+    public static void main(String[] args) {
+        if (args.length > 0) {
             int n = Integer.parseInt(args[0]);
             int trials = Integer.parseInt(args[1]);
             PercolationStats stats = new PercolationStats(n, trials);
